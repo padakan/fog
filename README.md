@@ -1,12 +1,5 @@
 <p align="center">
-  <img src="docs/img/icon.png" width="116" alt="Fog">
-</p>
-
-<h1 align="center">Fog</h1>
-
-<p align="center">
-  <b>Every second of your limit counts. Don't burn it waiting on your AI.</b><br>
-  Fog turns your screen's edge into a live status light for Claude, Codex, Gemini &amp; Cursor.
+  <img src="docs/img/og.png" alt="Fog — ambient AI status border for macOS">
 </p>
 
 <p align="center">
