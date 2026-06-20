@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="docs/img/og.png" alt="Fog — ambient AI status border for macOS">
+  <a href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg">
+    <img src="docs/img/og.png" alt="Fog — ambient AI status border for macOS · click to download">
+  </a>
 </p>
 
 <p align="center">
