@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/padakan/fog/releases/latest"><b>↓ Download for macOS</b></a>
+  <a href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg"><b>↓ Download for macOS</b></a>
   &nbsp;·&nbsp; <a href="https://padakan.github.io/fog/">Website</a>
 </p>
 

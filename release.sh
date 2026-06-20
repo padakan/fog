@@ -21,13 +21,16 @@ ditto -c -k --sequesterRsrc --keepParent "dist/Fog.app" "$ZIP"
 
 echo "→ Building DMG (for first-time install)"
 VERSION="$VER" ./dmg.sh "$VER"
-DMG="dist/Fog-${VER}.dmg"
+# Stable filename so the site/README link straight to the latest DMG:
+#   https://github.com/OWNER/REPO/releases/latest/download/Fog.dmg
+cp "dist/Fog-${VER}.dmg" "dist/Fog.dmg"
+DMG="dist/Fog.dmg"
 
 echo "→ Publishing v$VER to GitHub Releases"
 gh release create "v$VER" "$DMG" "$ZIP" \
     --repo "$REPO" \
     --title "Fog $VER" \
-    --notes "Download **Fog-${VER}.dmg**, drag Fog into Applications. First launch: right-click → Open." \
+    --notes "Download **Fog.dmg**, drag Fog into Applications. First launch: right-click → Open." \
     --latest
 
-echo "✓ Released v$VER — DMG (install) + ZIP (auto-update) attached."
+echo "✓ Released v$VER — Fog.dmg (install) + ZIP (auto-update) attached."
