@@ -61,6 +61,16 @@ final class InteractiveController {
         return a.processIdentifier == b.processIdentifier
     }
 
+    /// Called on a mouse click — if the Done pill is up and you've clicked back into
+    /// the chat app (e.g. the text box to type), dismiss it.
+    func dismissDonePillOnClickInChatApp() {
+        guard model.state == .done else { return }
+        if isSameApp(NSWorkspace.shared.frontmostApplication, chatHostApp) {
+            model.goIdle()
+            hide()
+        }
+    }
+
     /// Called by the AppDelegate after the model updates.
     /// `preview` = triggered from the menu-bar popover (don't touch chat-host tracking,
     /// and always show the UI so it can be seen).
@@ -110,8 +120,6 @@ final class InteractiveController {
         // Let the sweep play first, then pop the pill.
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self, self.doneToken == token, self.model.state == .done else { return }
-            // Already looking at the chat app? The sweep + sound are enough — no pill.
-            if !preview && self.isSameApp(NSWorkspace.shared.frontmostApplication, self.chatHostApp) { return }
             let tint = self.model.theme.primary
             let view = DonePillView(
                 tint: tint,

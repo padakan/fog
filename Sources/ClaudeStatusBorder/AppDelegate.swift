@@ -39,15 +39,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setupMouseTracking() {
-        let events: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged]
-        let global = NSEvent.addGlobalMonitorForEvents(matching: events) { [weak self] _ in
+        let moveEvents: NSEvent.EventTypeMask = [.mouseMoved, .leftMouseDragged, .rightMouseDragged]
+        let global = NSEvent.addGlobalMonitorForEvents(matching: moveEvents) { [weak self] _ in
             MainActor.assumeIsolated { self?.updateCursor() }
         }
-        let local = NSEvent.addLocalMonitorForEvents(matching: events) { [weak self] e in
+        let local = NSEvent.addLocalMonitorForEvents(matching: moveEvents) { [weak self] e in
             MainActor.assumeIsolated { self?.updateCursor() }
             return e
         }
-        mouseMonitors = [global, local].compactMap { $0 }
+        // A click in another app (e.g. clicking the chat's text box) dismisses the Done pill.
+        let click = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            MainActor.assumeIsolated { self?.interactive?.dismissDonePillOnClickInChatApp() }
+        }
+        mouseMonitors = [global, local, click].compactMap { $0 }
         updateCursor()
     }
 
