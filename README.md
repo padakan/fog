@@ -1,10 +1,31 @@
-# Fog — Claude Status Border
+<p align="center">
+  <img src="docs/img/icon.png" width="116" alt="Fog">
+</p>
 
-A macOS ambient status indicator for **Claude Code**. It draws a glowing **border
-around the edge of your screen** — opacity 100 hard against the edge, fading to 0
-about 16px inward — that animates depending on what Claude is doing. Corners are left
-sharp so the macOS display mask clips them to the *real* screen-corner radius (rounded
-on a MacBook, square on an external monitor).
+<h1 align="center">Fog</h1>
+
+<p align="center">
+  <b>Every second of your limit counts. Don't burn it waiting on your AI.</b><br>
+  Fog turns your screen's edge into a live status light for Claude, Codex, Gemini &amp; Cursor.
+</p>
+
+<p align="center">
+  <a href="https://github.com/padakan/fog/releases/latest"><b>↓ Download for macOS</b></a>
+  &nbsp;·&nbsp; <a href="https://padakan.github.io/fog/">Website</a>
+</p>
+
+<p align="center">
+  <img src="docs/img/onboarding.png" width="430">
+  <img src="docs/img/dmg.png" width="430">
+</p>
+
+---
+
+A macOS ambient status indicator for **Claude Code** and other AI agents. It draws a
+glowing **border around the edge of your screen** — opacity 100 hard against the edge,
+fading to 0 about 16px inward — that animates depending on what your agent is doing.
+Corners are left sharp so the macOS display mask clips them to the *real* screen-corner
+radius (rounded on a MacBook, square on an external monitor).
 
 The border is a transparent, click-through, always-on-top overlay — it never steals
 focus or blocks anything underneath. The interactive bits (waiting dialog, done pill)

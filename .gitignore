@@ -9,3 +9,6 @@ dist/
 *.xcuserstate
 .swiftpm/
 Package.resolved
+
+# Local preview config
+.claude/
