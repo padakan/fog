@@ -31,8 +31,9 @@ final class InteractiveController {
 
     /// The app that was frontmost (the terminal running Claude Code) before we showed UI.
     private var previousApp: NSRunningApplication?
-    /// The app you're actually chatting in — captured while thinking/working.
+    /// The app you're actually chatting in — captured at the START of a turn only.
     private var chatHostApp: NSRunningApplication?
+    private var lastState: ClaudeState = .idle
     private var doneToken = 0
     private var activationObserver: NSObjectProtocol?
 
@@ -76,9 +77,13 @@ final class InteractiveController {
     /// and always show the UI so it can be seen).
     func update(preview: Bool = false) {
         let front = NSWorkspace.shared.frontmostApplication
+        // A turn begins when we leave idle/done — that's when you actually submitted,
+        // so capture the chat app then (not on every tool event mid-turn, which would
+        // follow you if you wandered to another app while Claude works).
+        let turnStart = (lastState == .idle || lastState == .done)
         switch model.state {
         case .thinking, .working:
-            if !preview { chatHostApp = front }   // remember where you're driving the agent
+            if !preview && turnStart { chatHostApp = front }
             hide()
         case .waiting:
             previousApp = front
@@ -94,6 +99,7 @@ final class InteractiveController {
         case .idle:
             hide()
         }
+        lastState = model.state
     }
 
     // MARK: Waiting
@@ -158,8 +164,15 @@ final class InteractiveController {
 
     /// Bring the app you're actually chatting in (the Claude/IDE/terminal) to the
     /// front — not whatever app happened to be frontmost when the event fired.
+    /// Uses openApplication (reliable across apps) + activate() as a fallback.
     private func focusChatApp() {
-        (chatHostApp ?? previousApp)?.activate()
+        let app = chatHostApp ?? previousApp
+        if let url = app?.bundleURL {
+            let cfg = NSWorkspace.OpenConfiguration()
+            cfg.activates = true
+            NSWorkspace.shared.openApplication(at: url, configuration: cfg)
+        }
+        app?.activate()
     }
 
     /// Best-effort answer: focus the chat app and type the option number + Return.
