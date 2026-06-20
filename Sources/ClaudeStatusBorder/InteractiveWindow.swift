@@ -95,7 +95,7 @@ final class InteractiveController {
             options: model.options,
             tint: tint,
             onOption: { [weak self] i in self?.answer(index: i) },
-            onFocus: { [weak self] in self?.focusPreviousApp(); self?.hide() },
+            onFocus: { [weak self] in self?.focusChatApp(); self?.hide() },
             onDismiss: { [weak self] in self?.hide() }
         )
         present(AnyView(view), edgeGap: 0)
@@ -115,7 +115,7 @@ final class InteractiveController {
             let tint = self.model.theme.primary
             let view = DonePillView(
                 tint: tint,
-                onOpen: { [weak self] in self?.focusPreviousApp(); self?.model.goIdle(); self?.hide() },
+                onOpen: { [weak self] in self?.focusChatApp(); self?.model.goIdle(); self?.hide() },
                 onDismiss: { [weak self] in self?.model.goIdle(); self?.hide() }
             )
             self.present(AnyView(view), edgeGap: 0)
@@ -148,14 +148,16 @@ final class InteractiveController {
 
     // MARK: Actions
 
-    private func focusPreviousApp() {
-        previousApp?.activate()
+    /// Bring the app you're actually chatting in (the Claude/IDE/terminal) to the
+    /// front — not whatever app happened to be frontmost when the event fired.
+    private func focusChatApp() {
+        (chatHostApp ?? previousApp)?.activate()
     }
 
-    /// Best-effort answer: focus the terminal and type the option number + Return.
+    /// Best-effort answer: focus the chat app and type the option number + Return.
     /// Needs Accessibility permission to post keystrokes to another app.
     private func answer(index: Int) {
-        focusPreviousApp()
+        focusChatApp()
         let keys = "\(index + 1)"
         hide()
         guard ensureAccessibility() else { return }
