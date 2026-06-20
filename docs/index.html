@@ -68,26 +68,38 @@
   .note{font-size:12.5px;color:var(--muted2);margin-top:16px}
 
   /* ---- interactive demo screen ---- */
-  .stage{margin:60px auto 0;max-width:600px}
-  .frame{position:relative;border-radius:24px;padding:46px 36px;min-height:200px;overflow:hidden;
-    background:linear-gradient(180deg,rgba(38,38,46,.92),rgba(24,24,30,.96));
-    box-shadow:0 40px 90px rgba(0,0,0,.55);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-  .frame::before{content:"";position:absolute;inset:0;border-radius:24px;padding:3px;
+  .stage{margin:60px auto 0;max-width:680px}
+  /* a clean macOS "screen" mockup with Fog glowing around its edge */
+  .screen{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/10;
+    border:1px solid rgba(255,255,255,.08);box-shadow:0 50px 120px rgba(0,0,0,.6)}
+  .screen::before{content:"";position:absolute;inset:0;border-radius:20px;padding:4px;z-index:4;pointer-events:none;
     background:conic-gradient(from var(--ang), transparent 0deg, var(--g1) 55deg, var(--g2) 115deg, transparent 210deg, transparent 360deg);
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;mask-composite:exclude;
-    filter:blur(2px);animation:spin var(--spin) linear infinite, breathe var(--pulse) ease-in-out infinite}
-  body.hold .frame::before{animation:none;opacity:1}
+    filter:blur(2.5px);animation:spin var(--spin) linear infinite, breathe var(--pulse) ease-in-out infinite}
+  .screen::after{content:"";position:absolute;inset:0;border-radius:20px;z-index:4;pointer-events:none;
+    box-shadow:inset 0 0 42px 2px var(--glow);animation:breathe var(--pulse) ease-in-out infinite}
+  body.hold .screen::before, body.hold .screen::after{animation:none;opacity:1}
   @keyframes spin{to{--ang:360deg}}
-  .frame .dot{width:46px;height:46px;border-radius:50%;background:var(--g1);
-    box-shadow:0 0 30px 6px var(--glow);animation:breathe var(--pulse) ease-in-out infinite}
-  body.hold .frame .dot{animation:none}
-  .frame .st{font-size:17px;font-weight:700}
-  .frame .sd{font-size:13px;color:var(--muted);text-align:center}
-  .frame .sweep{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
-    transform:translateX(-120%);opacity:0}
-  .frame.flash .sweep{animation:sweep .9s ease-out}
+  .bar{position:absolute;top:0;left:0;right:0;height:28px;display:flex;align-items:center;gap:9px;padding:0 13px;z-index:3;
+    background:rgba(18,16,20,.5);backdrop-filter:blur(10px);font-size:11px;color:rgba(255,255,255,.7)}
+  .bar .sp{flex:1}
+  .bar img{width:15px;height:15px;border-radius:4px;display:block}
+  .wall{position:absolute;inset:0;padding-top:28px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(140deg,#241c2e 0%,#5b3a45 48%,#c47e54 100%)}
+  .win{width:66%;max-width:360px;background:rgba(18,18,22,.72);backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+  .wd{display:flex;gap:6px;margin-bottom:12px}
+  .wd i{width:9px;height:9px;border-radius:50%}
+  .wd i:nth-child(1){background:#ff5f57}.wd i:nth-child(2){background:#febc2e}.wd i:nth-child(3){background:#28c840}
+  .status{display:flex;align-items:center;gap:9px}
+  .sdot{width:13px;height:13px;border-radius:50%;background:var(--g1);box-shadow:0 0 16px 3px var(--glow);animation:breathe var(--pulse) ease-in-out infinite}
+  body.hold .sdot{animation:none}
+  .status b{font-size:15px;font-weight:700}
+  .win .sd{font-size:12px;color:var(--muted);margin-top:5px}
+  .sweep{position:absolute;inset:0;z-index:5;pointer-events:none;
+    background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-120%);opacity:0}
+  .screen.flash .sweep{animation:sweep .9s ease-out}
   @keyframes sweep{0%{transform:translateX(-120%);opacity:1}100%{transform:translateX(120%);opacity:0}}
 
   .pills{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
@@ -143,11 +155,22 @@
       <p class="note">macOS 13+ · free · open source · the edges of this page are glowing — that's Fog ✦</p>
 
       <div class="stage" id="px-stage">
-        <div class="frame" id="frame">
+        <div class="screen" id="frame">
           <div class="sweep"></div>
-          <div class="dot"></div>
-          <div class="st" id="st">Thinking</div>
-          <div class="sd" id="sd">soft waves drift around the edge</div>
+          <div class="bar">
+            <b style="font-weight:700">Claude</b>
+            <span style="opacity:.55">File</span><span style="opacity:.55">Edit</span><span style="opacity:.55">View</span>
+            <span class="sp"></span>
+            <img src="img/icon.png" alt="Fog">
+            <span style="opacity:.7">Sun 9:41</span>
+          </div>
+          <div class="wall">
+            <div class="win">
+              <div class="wd"><i></i><i></i><i></i></div>
+              <div class="status"><span class="sdot"></span><b id="st">Thinking</b></div>
+              <div class="sd" id="sd">soft waves drift around the edge</div>
+            </div>
+          </div>
         </div>
         <div class="pills">
           <button class="pill on" data-s="thinking">Thinking</button>
