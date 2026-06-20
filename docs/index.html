@@ -97,6 +97,19 @@
   body.hold .sdot{animation:none}
   .status b{font-size:15px;font-weight:700}
   .win .sd{font-size:12px;color:var(--muted);margin-top:5px}
+  /* sample "Claude is waiting" dialog — shown only on the Waiting state */
+  .dialog{position:absolute;top:38px;left:50%;width:76%;max-width:320px;z-index:6;
+    transform:translateX(-50%) translateY(-16px);opacity:0;pointer-events:none;
+    background:rgba(28,28,34,.92);backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.14);border-radius:15px;padding:14px;
+    box-shadow:0 22px 55px rgba(0,0,0,.55), 0 0 22px var(--glow);
+    transition:opacity .4s cubic-bezier(.2,.7,.2,1), transform .4s cubic-bezier(.2,.7,.2,1)}
+  .screen.asking .dialog{opacity:1;transform:translateX(-50%) translateY(0)}
+  .dialog .dh{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:rgba(255,255,255,.58);margin-bottom:9px}
+  .dialog .dq{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:11px}
+  .dialog .db{font-size:11px;padding:8px 11px;border-radius:9px;margin-top:6px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+  .dialog .db b{color:var(--g2);margin-right:8px}
   .sweep{position:absolute;inset:0;z-index:5;pointer-events:none;
     background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-120%);opacity:0}
   .screen.flash .sweep{animation:sweep .9s ease-out}
@@ -170,6 +183,13 @@
               <div class="status"><span class="sdot"></span><b id="st">Thinking</b></div>
               <div class="sd" id="sd">soft waves drift around the edge</div>
             </div>
+          </div>
+          <div class="dialog">
+            <div class="dh">✋ Claude is waiting</div>
+            <div class="dq">Allow Claude to run: git push origin main?</div>
+            <div class="db"><b>1</b>Yes, run it</div>
+            <div class="db"><b>2</b>Yes, and don't ask again</div>
+            <div class="db"><b>3</b>No, tell Claude what to do</div>
           </div>
         </div>
         <div class="pills">
@@ -251,6 +271,7 @@
     body.dataset.state=name;
     stEl.textContent=s.st; sdEl.textContent=s.sd;
     document.querySelectorAll('.pill').forEach(p=>p.classList.toggle('on',p.dataset.s===name));
+    frame.classList.toggle('asking', name==='waiting');   // show the sample dialog
     if(name==='done'){ frame.classList.remove('flash'); void frame.offsetWidth; frame.classList.add('flash'); }
   }
 
