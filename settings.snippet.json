@@ -1,0 +1,23 @@
+{
+  "_comment": "Reference only. Run ./install-hooks.sh to merge this into your real settings.json with absolute paths. Replace ABS_PATH below if you wire it up by hand.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh idle" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh thinking" } ] }
+    ],
+    "PreToolUse": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh working" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "*", "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh thinking" } ] }
+    ],
+    "Notification": [
+      { "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh waiting" } ] }
+    ],
+    "Stop": [
+      { "hooks": [ { "type": "command", "command": "ABS_PATH/hooks/claude-status-notify.sh done" } ] }
+    ]
+  }
+}
