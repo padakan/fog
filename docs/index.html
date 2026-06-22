@@ -154,6 +154,35 @@
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
 
+  /* download instruction modal */
+  .mbg{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.62);backdrop-filter:blur(7px);
+    display:none;align-items:center;justify-content:center;padding:24px}
+  .mbg.on{display:flex}
+  .modal{background:#161619;border:1px solid var(--line);border-radius:22px;max-width:440px;width:100%;
+    padding:26px;max-height:90vh;overflow:auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.6);
+    animation:pop .3s cubic-bezier(.2,.8,.2,1)}
+  @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+  .modal h3{font-size:21px;font-weight:800;margin-bottom:4px}
+  .modal .msub{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+  .mclose{position:absolute;top:15px;right:15px;width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(255,255,255,.08);color:#fff;font-size:15px}
+  .mclose:hover{background:rgba(255,255,255,.16)}
+  .gk{background:#1f1f22;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px;text-align:center;margin-bottom:18px;position:relative}
+  .gk-q{position:absolute;top:11px;right:11px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.1);color:var(--muted);font-size:12px;line-height:22px}
+  .gk-ic{width:50px;height:50px;border-radius:11px;margin:2px auto 12px;position:relative;background:linear-gradient(135deg,#cfcfd4,#9a9aa0)}
+  .gk-ic::after{content:"⚠️";position:absolute;right:-7px;bottom:-9px;font-size:20px}
+  .gk-t{font-size:14px;font-weight:700;margin-bottom:6px}
+  .gk-x{font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:14px}
+  .gk-b1{background:#0a84ff;color:#fff;border-radius:9px;padding:8px;font-size:12.5px;font-weight:600;margin-bottom:7px}
+  .gk-b2{background:rgba(255,255,255,.1);color:#fff;border-radius:9px;padding:8px;font-size:12.5px;font-weight:600}
+  .method{display:flex;gap:12px;margin-bottom:14px;text-align:left}
+  .mnum{flex:none;width:26px;height:26px;border-radius:50%;background:var(--g1);color:#fff;font-weight:800;font-size:13px;line-height:26px;text-align:center}
+  .method b{font-size:14px}
+  .method .mtip{font-size:12px;color:var(--muted);margin-top:3px}
+  .code{display:flex;align-items:center;gap:8px;background:#0c0c0f;border:1px solid var(--line);border-radius:9px;
+    padding:9px 11px;margin-top:7px;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:#e9c8b8;overflow-x:auto}
+  .code button{flex:none;border:none;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600}
+  .code button:hover{background:var(--g1)}
   @media(max-width:760px){.grid,.shots{grid-template-columns:1fr}h1{letter-spacing:-2px}}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -170,7 +199,7 @@
       <p class="tag">Every second of your limit counts.<br>Don't burn it waiting on your AI.</p>
       <p class="sub">Fog turns your screen's edge into a live status light for Claude, Codex, Gemini &amp; Cursor — glance, and you know if it's thinking, waiting, or done.</p>
       <div class="cta">
-        <a class="btn" href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg">↓ Download for macOS</a>
+        <a class="btn dl" href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg">↓ Download for macOS</a>
         <a class="btn ghost" href="https://github.com/padakan/fog">View on GitHub</a>
       </div>
       <p class="note">macOS 13+ · free · open source · the edges of this page are glowing — that's Fog ✦</p>
@@ -247,9 +276,41 @@
         <span class="chip">Gemini CLI <small>Google</small></span>
         <span class="chip">Cursor <small>built-in agent</small></span>
       </div>
-      <a class="btn reveal" href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg">↓ Get Fog</a>
+      <a class="btn reveal dl" href="https://github.com/padakan/fog/releases/latest/download/Fog.dmg">↓ Get Fog</a>
     </div>
   </section>
+
+  <div class="mbg" id="dlModal">
+    <div class="modal">
+      <button class="mclose" id="mClose" aria-label="Close">✕</button>
+      <h3>Opening Fog the first time</h3>
+      <p class="msub">Your download is starting ↓ &nbsp;macOS blocks indie apps once — you'll see this:</p>
+      <div class="gk">
+        <div class="gk-q">?</div>
+        <div class="gk-ic"></div>
+        <div class="gk-t">“Fog” Not Opened</div>
+        <div class="gk-x">Apple could not verify “Fog” is free of malware that may harm your Mac or compromise your privacy.</div>
+        <div class="gk-b1">Move to Trash</div>
+        <div class="gk-b2">Done</div>
+      </div>
+      <p class="msub" style="margin-bottom:14px">Click <b style="color:#fff">Done</b> (not Move to Trash!), then open it one of two ways:</p>
+      <div class="method">
+        <div class="mnum">1</div>
+        <div>
+          <b>Terminal <span style="color:var(--g2)">(easiest)</span></b>
+          <div class="mtip">Paste this, press Enter, then open Fog normally:</div>
+          <div class="code"><span>xattr -dr com.apple.quarantine /Applications/Fog.app</span><button id="mCopy">Copy</button></div>
+        </div>
+      </div>
+      <div class="method">
+        <div class="mnum">2</div>
+        <div>
+          <b>System Settings</b>
+          <div class="mtip">Privacy &amp; Security → scroll down → <b style="color:#fff">Open Anyway</b> → confirm.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer>
     made with <span class="heart">♥</span> by <a href="https://instagram.com/padagot">@padagot</a>
@@ -317,6 +378,20 @@
   // scroll reveal
   const io=new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.15});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+<script>
+(function(){
+  const bg=document.getElementById('dlModal');
+  document.querySelectorAll('a.dl').forEach(a=>a.addEventListener('click',()=>{ setTimeout(()=>bg.classList.add('on'),150); }));
+  document.getElementById('mClose').addEventListener('click',()=>bg.classList.remove('on'));
+  bg.addEventListener('click',e=>{ if(e.target===bg) bg.classList.remove('on'); });
+  addEventListener('keydown',e=>{ if(e.key==='Escape') bg.classList.remove('on'); });
+  const cp=document.getElementById('mCopy');
+  cp.addEventListener('click',()=>{
+    navigator.clipboard.writeText('xattr -dr com.apple.quarantine /Applications/Fog.app');
+    cp.textContent='Copied!'; setTimeout(()=>cp.textContent='Copy',1500);
+  });
 })();
 </script>
 </body>
