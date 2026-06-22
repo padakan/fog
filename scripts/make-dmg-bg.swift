@@ -46,7 +46,7 @@ head.line(to: NSPoint(x: 336, y: y - 14))
 head.stroke()
 
 // First-launch hint baked into the background (no extra icon needed).
-draw("First launch: right-click Fog → Open", 11, .regular, NSColor(white: 0.62, alpha: 1), centerY: 44)
+draw("Blocked on first open?  System Settings → Privacy & Security → Open Anyway", 10.5, .regular, NSColor(white: 0.6, alpha: 1), centerY: 40)
 
 NSGraphicsContext.restoreGraphicsState()
 let out = URL(fileURLWithPath: "Resources/dmg-background.png")

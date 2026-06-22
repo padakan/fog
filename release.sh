@@ -30,7 +30,7 @@ echo "→ Publishing v$VER to GitHub Releases"
 gh release create "v$VER" "$DMG" "$ZIP" \
     --repo "$REPO" \
     --title "Fog $VER" \
-    --notes "Download **Fog.dmg**, drag Fog into Applications. First launch: right-click → Open." \
+    --notes "Download **Fog.dmg**, drag Fog into Applications. First open: System Settings → Privacy & Security → **Open Anyway** (indie app, not notarized)." \
     --latest
 
 echo "✓ Released v$VER — Fog.dmg (install) + ZIP (auto-update) attached."

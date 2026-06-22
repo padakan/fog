@@ -126,7 +126,7 @@ states → Permissions → Done). Re-open it anytime from the menu-bar popover �
 
 | Permission | When | Required? | Without it |
 |------------|------|-----------|------------|
-| Gatekeeper (right-click → Open) | first launch | yes | app won't open |
+| Gatekeeper (Open Anyway) | first launch | yes | app won't open |
 | Notifications | onboarding | for waiting/done banners | sound + border still work |
 | Screen Recording | onboarding (optional) | only the Done screen-shake | gloss + sound still play |
 | Accessibility | onboarding (optional) | only typing an answer back | the button just focuses the terminal |
@@ -161,12 +161,13 @@ FOG_REPO=youruser/fog ./release.sh 1.1          # builds, makes .dmg + .zip, pub
 (Or build a DMG on its own: `./dmg.sh 1.1`.)
 
 **First install for a friend (important — Fog is ad-hoc signed, not notarized):**
-Open the `.dmg`, drag **Fog** into Applications. First launch only: right-click
-Fog.app → **Open** (macOS asks once for indie apps). If it still won't open:
+Open the `.dmg`, drag **Fog** into Applications, then open it. macOS will say
+*"Fog Not Opened — Apple could not verify…"* (normal for an indie app). To allow it:
 
-```bash
-xattr -dr com.apple.quarantine /Applications/Fog.app
-```
+- **System Settings → Privacy & Security**, scroll to **Security**, click **Open Anyway**
+  next to the Fog message, then confirm. *(On macOS Sequoia the old right-click → Open
+  no longer works for this — you must use Open Anyway here.)*
+- …or once, in Terminal: `xattr -dr com.apple.quarantine /Applications/Fog.app`
 
 After the first launch, in-app updates are friction-free (Fog strips quarantine on each
 update itself). Keep it in `/Applications` (or `~/Applications`) so updates can replace
