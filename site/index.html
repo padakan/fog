@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0A84FF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0A0C" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <title>พจนานุกรม ไทย–อังกฤษ</title>
+<style>
+  :root{
+    --sf: -apple-system, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", "Sukhumvit Set", "Thonburi", sans-serif;
+    /* Light – liquid glass palette */
+    --bg:#EAEDF2; --bg2:#DDE3EC;
+    --glass:rgba(255,255,255,.55);
+    --glass-strong:rgba(255,255,255,.72);
+    --glass-brd:rgba(255,255,255,.65);
+    --hairline:rgba(60,60,67,.16);
+    --label:#0B0B0F; --label-2:rgba(60,60,67,.62); --label-3:rgba(60,60,67,.34);
+    --fill:rgba(120,120,128,.16);
+    --tint:#0A84FF; --tint-ink:#0066D6;
+    --green:#34C759;
+    --spec:rgba(255,255,255,.9);   /* specular highlight */
+    --shadow:rgba(20,30,60,.16);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0A0A0C; --bg2:#101218;
+      --glass:rgba(40,42,52,.52);
+      --glass-strong:rgba(48,50,62,.68);
+      --glass-brd:rgba(255,255,255,.14);
+      --hairline:rgba(255,255,255,.12);
+      --label:#FFFFFF; --label-2:rgba(235,235,245,.62); --label-3:rgba(235,235,245,.34);
+      --fill:rgba(120,120,128,.32);
+      --tint:#0A84FF; --tint-ink:#5AB0FF;
+      --green:#30D158;
+      --spec:rgba(255,255,255,.28);
+      --shadow:rgba(0,0,0,.55);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:var(--sf); color:var(--label);
+    -webkit-font-smoothing:antialiased; font-size:17px; line-height:1.4;
+    overscroll-behavior-y:none; display:flex; flex-direction:column; height:100dvh;
+    /* ambient liquid-glass background: soft color blobs */
+    background:
+      radial-gradient(60% 50% at 12% 8%, rgba(10,132,255,.18), transparent 70%),
+      radial-gradient(55% 45% at 92% 12%, rgba(52,199,89,.14), transparent 72%),
+      radial-gradient(70% 60% at 50% 105%, rgba(120,90,255,.16), transparent 70%),
+      linear-gradient(180deg, var(--bg), var(--bg2));
+    background-attachment:fixed;
+  }
+
+  /* ===== Top liquid-glass nav ===== */
+  .nav{
+    position:sticky; top:0; z-index:40; flex:0 0 auto;
+    padding:env(safe-area-inset-top) 10px 0;
+  }
+  .nav-inner{
+    margin:8px 6px 0;
+    height:52px; display:flex; align-items:center; gap:10px;
+    padding:0 8px 0 14px;
+    border-radius:22px;
+    background:var(--glass-strong);
+    -webkit-backdrop-filter:blur(28px) saturate(190%); backdrop-filter:blur(28px) saturate(190%);
+    border:1px solid var(--glass-brd);
+    box-shadow:0 6px 22px var(--shadow), inset 0 1px 0 var(--spec);
+    position:relative; overflow:hidden;
+  }
+  /* glass top sheen */
+  .nav-inner::before{
+    content:""; position:absolute; inset:0 0 auto 0; height:50%;
+    background:linear-gradient(180deg, rgba(255,255,255,.35), transparent);
+    opacity:.5; pointer-events:none;
+  }
+  @media (prefers-color-scheme:dark){ .nav-inner::before{opacity:.18;} }
+  .back-btn{
+    display:none; align-items:center; gap:3px;
+    border:0; background:transparent; color:var(--tint); cursor:pointer;
+    font-family:var(--sf); font-size:17px; font-weight:500; padding:6px 8px 6px 4px;
+    border-radius:14px; flex:0 0 auto;
+  }
+  .back-btn:active{background:var(--fill);}
+  .back-btn svg{flex:0 0 auto;}
+  .nav.has-back .back-btn{display:flex;}
+  .nav-title{flex:1; min-width:0;}
+  .nav-title .t{font-size:17px; font-weight:650; letter-spacing:-.2px; line-height:1.15;}
+  .nav-title .s{font-size:11px; font-weight:500; color:var(--label-2); letter-spacing:.3px; margin-top:1px;}
+  .nav.has-back .nav-title{text-align:center;}
+  .nav-badge{
+    flex:0 0 auto; font-size:11px; font-weight:700; letter-spacing:.4px;
+    color:var(--tint-ink); background:color-mix(in srgb, var(--tint) 16%, transparent);
+    padding:5px 10px; border-radius:12px; border:1px solid var(--glass-brd);
+  }
+
+  /* ===== scroll ===== */
+  .scroll{flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .content{padding:14px 16px 120px; max-width:680px; margin:0 auto;}
+
+  .group-label{font-size:12.5px;color:var(--label-2);padding:4px 6px 8px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+
+  /* glass card */
+  .card{
+    position:relative;
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid var(--glass-brd);
+    border-radius:24px; overflow:hidden; margin-bottom:20px;
+    box-shadow:0 8px 28px var(--shadow), inset 0 1px 0 var(--spec);
+  }
+  .card::before{
+    content:""; position:absolute; inset:0 0 auto 0; height:46%;
+    background:linear-gradient(180deg, rgba(255,255,255,.30), transparent);
+    opacity:.5; pointer-events:none;
+  }
+  @media (prefers-color-scheme:dark){ .card::before{opacity:.14;} }
+
+  .card-header{padding:20px 20px 16px; border-bottom:1px solid var(--hairline); position:relative;}
+  .word-th{font-size:32px; font-weight:750; letter-spacing:-.4px; line-height:1.12;}
+  .word-en-head{font-size:25px; font-weight:700; letter-spacing:-.2px;}
+  .word-meta{display:flex; gap:10px; align-items:center; margin-top:7px; flex-wrap:wrap;}
+  .rom{font-size:16px; color:var(--label-2);}
+  .ipa{font-size:15px; color:var(--label-3);}
+  .speak{
+    margin-left:auto; width:34px;height:34px;border-radius:50%;border:1px solid var(--glass-brd);
+    background:var(--glass-strong); color:var(--tint);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;
+    box-shadow:inset 0 1px 0 var(--spec);
+  }
+  .speak:active{transform:scale(.94);}
+
+  .sense{padding:15px 20px;border-bottom:1px solid var(--hairline);display:flex;gap:12px;align-items:flex-start;}
+  .sense:last-child{border-bottom:0;}
+  .pos-pill{flex:0 0 auto;margin-top:2px;font-size:12px;font-weight:650;letter-spacing:.2px;color:var(--tint-ink);background:color-mix(in srgb,var(--tint) 14%,transparent);padding:3px 10px;border-radius:9px;min-width:56px;text-align:center;text-transform:lowercase;border:1px solid var(--glass-brd);}
+  .pos-pill.empty{visibility:hidden;}
+  .defs{flex:1;min-width:0;}
+  .def-primary{font-size:18px;font-weight:550;line-height:1.35;}
+  .def-rest{font-size:15px;color:var(--label-2);margin-top:3px;line-height:1.4;}
+
+  /* EN→TH tappable rows */
+  .th-row{padding:15px 20px;border-bottom:1px solid var(--hairline);display:flex;align-items:baseline;gap:12px;cursor:pointer;}
+  .th-row:last-child{border-bottom:0;}
+  .th-row:active{background:var(--fill);}
+  .th-row .w{font-size:21px;font-weight:650;}
+  .th-row .r{font-size:14px;color:var(--label-2);}
+  .th-row .chev{margin-left:auto;color:var(--label-3);}
+
+  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:72px 32px;color:var(--label-2);}
+  .state .ic{
+    width:88px;height:88px;border-radius:28px;margin-bottom:18px;
+    background:var(--glass); border:1px solid var(--glass-brd);
+    -webkit-backdrop-filter:blur(18px) saturate(180%); backdrop-filter:blur(18px) saturate(180%);
+    display:flex;align-items:center;justify-content:center;color:var(--tint);
+    box-shadow:0 8px 24px var(--shadow), inset 0 1px 0 var(--spec);
+  }
+  .state h2{font-size:20px;font-weight:700;color:var(--label);margin:0 0 7px;}
+  .state p{font-size:15px;margin:0;max-width:300px;}
+  .spinner{width:30px;height:30px;border-radius:50%;border:3px solid var(--hairline);border-top-color:var(--tint);animation:spin .8s linear infinite;margin-bottom:14px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ===== bottom liquid-glass dock ===== */
+  .dock{
+    position:fixed; left:0; right:0; bottom:0; z-index:50;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    will-change:transform;
+  }
+  .dock-inner{
+    max-width:680px; margin:0 auto;
+    display:flex; align-items:center; gap:9px;
+    padding:8px 10px;
+    border-radius:24px;
+    background:var(--glass-strong);
+    -webkit-backdrop-filter:blur(28px) saturate(190%); backdrop-filter:blur(28px) saturate(190%);
+    border:1px solid var(--glass-brd);
+    box-shadow:0 -2px 10px var(--shadow), 0 10px 30px var(--shadow), inset 0 1px 0 var(--spec);
+    position:relative; overflow:hidden;
+  }
+  .dock-inner::before{
+    content:""; position:absolute; inset:0 0 auto 0; height:50%;
+    background:linear-gradient(180deg, rgba(255,255,255,.35), transparent);
+    opacity:.5; pointer-events:none;
+  }
+  @media (prefers-color-scheme:dark){ .dock-inner::before{opacity:.16;} }
+  .lang{font-size:12px;font-weight:750;color:var(--tint-ink);background:color-mix(in srgb,var(--tint) 16%,transparent);padding:5px 9px;border-radius:13px;flex:0 0 auto;min-width:36px;text-align:center;border:1px solid var(--glass-brd);}
+  .dock svg.mag{flex:0 0 auto;opacity:.5;margin-left:2px;}
+  .dock input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-family:var(--sf);font-size:17px;color:var(--label);padding:6px 0;}
+  .dock input::placeholder{color:var(--label-2);}
+  .dock input::-webkit-search-cancel-button,.dock input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none;}
+  .clear-btn{width:24px;height:24px;border-radius:50%;border:0;background:rgba(120,120,128,.5);color:#fff;display:none;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:0 0 auto;}
+  .clear-btn.show{display:flex;}
+  .clear-btn:active{transform:scale(.9);}
+
+  /* suggestions float above dock as glass */
+  .suggestions{
+    position:fixed; left:14px; right:14px; z-index:55;
+    max-width:680px; margin:0 auto;
+    background:var(--glass-strong);
+    -webkit-backdrop-filter:blur(30px) saturate(190%); backdrop-filter:blur(30px) saturate(190%);
+    border:1px solid var(--glass-brd);
+    border-radius:22px; overflow:hidden;
+    max-height:46vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    box-shadow:0 -6px 30px var(--shadow), 0 12px 30px var(--shadow), inset 0 1px 0 var(--spec);
+    display:none;
+  }
+  .suggestions.show{display:block;}
+  .sugg-row{display:flex;align-items:baseline;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--hairline);}
+  .sugg-row:last-child{border-bottom:0;}
+  .sugg-row:active,.sugg-row.active{background:var(--fill);}
+  .sugg-w{font-size:17px;font-weight:550;}
+  .sugg-w .match{color:var(--tint);}
+  .sugg-gloss{font-size:14px;color:var(--label-2);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:54%;text-align:right;}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+  <div class="nav" id="nav">
+    <div class="nav-inner">
+      <button class="back-btn" id="backBtn" aria-label="ย้อนกลับ">
+        <svg width="11" height="18" viewBox="0 0 11 18" fill="none"><path d="M9.5 1 2 9l7.5 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        กลับ
+      </button>
+      <div class="nav-title">
+        <div class="t" id="navT">พจนานุกรม</div>
+        <div class="s" id="navS">ไทย ⇄ อังกฤษ</div>
+      </div>
+      <span class="nav-badge" id="navBadge">TH·EN</span>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll">
+    <div class="content" id="content"></div>
+  </div>
+
+  <div class="suggestions" id="suggestions" role="listbox"></div>
+
+  <div class="dock" id="dock">
+    <div class="dock-inner">
+      <span class="lang" id="langTag">TH</span>
+      <svg class="mag" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 1a6 6 0 1 0 3.7 10.7l3.3 3.3 1.4-1.4-3.3-3.3A6 6 0 0 0 7 1Zm0 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z" fill="currentColor"/></svg>
+      <input id="q" type="search" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="พิมพ์คำไทยหรืออังกฤษ" aria-label="ค้นหา">
+      <button class="clear-btn" id="clear" aria-label="ล้างและกลับหน้าแรก"><svg width="11" height="11" viewBox="0 0 11 11"><path d="M1.5 1.5l8 8M9.5 1.5l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+
+
+<script>
+(function(){
+  const content=document.getElementById('content');
+  const nav=document.getElementById('nav');
+  const scroll=document.getElementById('scroll');
+  const input=document.getElementById('q');
+  const clearBtn=document.getElementById('clear');
+  const suggBox=document.getElementById('suggestions');
+  const dock=document.getElementById('dock');
+  const langTag=document.getElementById('langTag');
+  const backBtn=document.getElementById('backBtn');
+  const navT=document.getElementById('navT');
+  const navS=document.getElementById('navS');
+
+  let TH=null, EN=null, THKEYS=[], ENKEYS=[];
+  let activeIdx=-1;
+  let backStack=[];   // navigation stack of view-states
+
+  const POS={noun:'noun',verb:'verb',adj:'adj',adv:'adv',prep:'prep',pronoun:'pron',conj:'conj',interj:'interj',prefix:'pref',suffix:'suff',number:'num',classifier:'class'};
+  const posLabel=p=>POS[p]||(p||'');
+  const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const isThai=s=>/[\u0E00-\u0E7F]/.test(s);
+
+  function setNavTitle(t,s){navT.textContent=t; navS.textContent=s;}
+  function showBack(on){ nav.classList.toggle('has-back', on); }
+
+  function setWelcome(){
+    backStack=[]; showBack(false); setNavTitle('พจนานุกรม','ไทย ⇄ อังกฤษ');
+    content.innerHTML=`<div class="state">
+      <div class="ic"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 1-2-2V5Z" stroke="currentColor" stroke-width="1.5"/><path d="M20 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 0 2-2V5Z" stroke="currentColor" stroke-width="1.5"/></svg></div>
+      <h2>เริ่มค้นหา</h2><p>พิมพ์คำภาษาไทยเพื่อแปลเป็นอังกฤษ หรือพิมพ์อังกฤษเพื่อแปลเป็นไทย</p></div>`;
+  }
+  function setLoading(){content.innerHTML='<div class="state"><div class="spinner"></div><p>กำลังโหลดพจนานุกรม…</p></div>';}
+  function setNotFound(qq){
+    content.innerHTML=`<div class="state">
+      <div class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <h2>ไม่พบคำ “${esc(qq)}”</h2><p>ลองตรวจการสะกด หรือพิมพ์เฉพาะคำหลัก</p></div>`;
+  }
+
+  setLoading();
+  fetch('dict.json').then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(d=>{
+    TH=d.th; EN=d.en;
+    THKEYS=Object.keys(TH).sort((a,b)=>a.localeCompare(b,'th'));   // A→Z (alphabetical) fixed
+    ENKEYS=Object.keys(EN).sort((a,b)=>a.localeCompare(b));
+    setWelcome();
+  }).catch(e=>{ content.innerHTML='<div class="state"><h2>โหลดข้อมูลไม่สำเร็จ</h2><p>'+esc(''+e)+'</p></div>'; });
+
+  // ===== search — alphabetical A→Z only =====
+  function searchTH(q,limit){
+    const pre=[],con=[];
+    for(const k of THKEYS){
+      if(k.startsWith(q)) pre.push(k);
+      else if(k.indexOf(q)>-1) con.push(k);
+      if(pre.length>=limit) break;
+    }
+    let out=pre.slice(0,limit);
+    if(out.length<limit) out=out.concat(con.slice(0,limit-out.length));
+    return out.map(w=>({w, gloss:(TH[w].s[0]&&TH[w].s[0].defs[0])||'', kind:'th'}));
+  }
+  function searchEN(q,limit){
+    q=q.toLowerCase();
+    const pre=[],con=[];
+    for(const k of ENKEYS){
+      if(k.startsWith(q)) pre.push(k);
+      else if(k.indexOf(q)>-1) con.push(k);
+      if(pre.length>=limit) break;
+    }
+    let out=pre.slice(0,limit);
+    if(out.length<limit) out=out.concat(con.slice(0,limit-out.length));
+    return out.map(k=>({w:k, gloss:EN[k].slice(0,3).map(x=>x[0]).join(', '), kind:'en'}));
+  }
+
+  function renderSuggestions(q){
+    const thai=isThai(q);
+    langTag.textContent=thai?'TH':'EN';
+    // closest matches first, then reverse so the best one sits at the BOTTOM (next to the search bar)
+    const items=(thai?searchTH(q,14):searchEN(q,14)).reverse();
+    activeIdx=-1;
+    if(!items.length){suggBox.classList.remove('show');suggBox.innerHTML='';return;}
+    const ql=q.toLowerCase();
+    suggBox.innerHTML=items.map((it,i)=>{
+      const disp=it.w, mi=disp.toLowerCase().indexOf(ql);
+      let wHtml=esc(disp);
+      if(mi>-1) wHtml=esc(disp.slice(0,mi))+'<span class="match">'+esc(disp.slice(mi,mi+q.length))+'</span>'+esc(disp.slice(mi+q.length));
+      return `<div class="sugg-row" role="option" data-w="${esc(disp)}" data-kind="${it.kind}" data-i="${i}">
+        <span class="sugg-w">${wHtml}</span>
+        <span class="sugg-gloss">${esc(it.gloss)}</span></div>`;
+    }).join('');
+    suggBox.classList.add('show');
+    positionSuggestions();
+    suggBox.scrollTop=suggBox.scrollHeight; // start at the bottom (closest match)
+  }
+  function positionSuggestions(){
+    const r=dock.getBoundingClientRect();
+    suggBox.style.bottom=(window.innerHeight - r.top + 6)+'px';
+  }
+
+  // ===== views (with back stack) =====
+  function pushView(state){ backStack.push(state); renderView(state); }
+  function renderView(state){
+    if(state.type==='th'){ renderTH(state.word); }
+    else if(state.type==='en'){ renderEN(state.term); }
+    showBack(backStack.length>1);
+  }
+  backBtn.addEventListener('click',()=>{
+    if(backStack.length<=1) return;
+    backStack.pop();
+    const prev=backStack[backStack.length-1];
+    renderView(prev);
+    // restore the search box text to match the view we returned to
+    input.value = prev.type==='en'? prev.term : prev.word;
+    langTag.textContent = isThai(input.value)?'TH':'EN';
+    clearBtn.classList.toggle('show', input.value.length>0);
+  });
+
+  function renderTH(word){
+    const ent=TH[word];
+    if(!ent){setNotFound(word);return;}
+    const head=ent.s[0];
+    setNavTitle(word,'ไทย → อังกฤษ');
+    content.innerHTML=`<div class="group-label">คำแปล (ไทย → อังกฤษ)</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="word-th">${esc(word)}</div>
+          <div class="word-meta">
+            ${head.rom?`<span class="rom">${esc(head.rom)}</span>`:''}
+            ${head.ipa?`<span class="ipa">/${esc(head.ipa)}/</span>`:''}
+            <button class="speak" id="speak" aria-label="ออกเสียง"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8 8 0 0 1 0 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+          </div>
+        </div>
+        ${ent.s.map(r=>{const pl=posLabel(r.pos),rest=r.defs.slice(1).join(', ');
+          return `<div class="sense"><span class="pos-pill ${pl?'':'empty'}">${esc(pl||'·')}</span>
+            <div class="defs"><div class="def-primary">${esc(r.defs[0]||'')}</div>${rest?`<div class="def-rest">${esc(rest)}</div>`:''}</div></div>`;
+        }).join('')}
+      </div>`;
+    scroll.scrollTop=0;
+    const sp=document.getElementById('speak'); if(sp) sp.addEventListener('click',()=>speak(word,'th-TH'));
+  }
+
+  function renderEN(term){
+    const items=EN[term];
+    if(!items||!items.length){setNotFound(term);return;}
+    setNavTitle(term,'อังกฤษ → ไทย');
+    const rows=items.map(([w])=>{
+      const rom=(TH[w]&&TH[w].s[0]&&TH[w].s[0].rom)||'';
+      return `<div class="th-row" data-w="${esc(w)}">
+        <span class="w">${esc(w)}</span>${rom?`<span class="r">${esc(rom)}</span>`:''}
+        <svg class="chev" width="9" height="14" viewBox="0 0 9 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>`;
+    }).join('');
+    content.innerHTML=`<div class="group-label">คำแปล (อังกฤษ → ไทย)</div>
+      <div class="card"><div class="card-header"><div class="word-en-head">${esc(term)}</div>
+      <div class="word-meta"><span class="rom">${items.length} คำแปล · แตะเพื่อดูรายละเอียด</span></div></div>${rows}</div>`;
+    scroll.scrollTop=0;
+    content.querySelectorAll('.th-row').forEach(el=>el.addEventListener('click',()=>{
+      pushView({type:'th', word:el.dataset.w});
+      input.value=el.dataset.w; langTag.textContent='TH';
+    }));
+  }
+
+  function speak(word,lang){
+    if(!('speechSynthesis' in window))return;
+    const u=new SpeechSynthesisUtterance(word); u.lang=lang; u.rate=.9;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }
+
+  function selectWord(w,kind){
+    input.value=w; suggBox.classList.remove('show'); input.blur();
+    backStack=[]; pushView(kind==='th'?{type:'th',word:w}:{type:'en',term:w});
+  }
+
+  // ===== input =====
+  let t;
+  input.addEventListener('input',()=>{
+    const v=input.value;
+    clearBtn.classList.toggle('show',v.length>0);
+    langTag.textContent=isThai(v)?'TH':'EN';
+    clearTimeout(t);
+    t=setTimeout(()=>{
+      if(!v.trim()){suggBox.classList.remove('show');setWelcome();return;}
+      renderSuggestions(v.trim());
+    },40);
+  });
+  input.addEventListener('keydown',e=>{
+    const rows=[...suggBox.querySelectorAll('.sugg-row')];
+    // rows are displayed with the closest match LAST (bottom). Default highlight = bottom row.
+    if(e.key==='ArrowUp'&&rows.length){e.preventDefault();activeIdx=activeIdx<0?rows.length-1:(activeIdx<=0?rows.length-1:activeIdx-1);paint(rows);}
+    else if(e.key==='ArrowDown'&&rows.length){e.preventDefault();activeIdx=activeIdx<0?rows.length-1:(activeIdx>=rows.length-1?0:activeIdx+1);paint(rows);}
+    else if(e.key==='Enter'){
+      e.preventDefault();
+      if(activeIdx>-1&&rows[activeIdx]) selectWord(rows[activeIdx].dataset.w,rows[activeIdx].dataset.kind);
+      else{const q=input.value.trim(); if(!q)return;
+        const items=isThai(q)?searchTH(q,1):searchEN(q,1);
+        if(items.length) selectWord(items[0].w,items[0].kind); else setNotFound(q);}
+    }
+  });
+  function paint(rows){rows.forEach((r,i)=>r.classList.toggle('active',i===activeIdx));if(rows[activeIdx])rows[activeIdx].scrollIntoView({block:'nearest'});}
+
+  suggBox.addEventListener('mousedown',e=>{const row=e.target.closest('.sugg-row');if(row){e.preventDefault();selectWord(row.dataset.w,row.dataset.kind);}});
+
+  // round X → clear & return to empty/welcome
+  clearBtn.addEventListener('click',()=>{
+    input.value=''; clearBtn.classList.remove('show');
+    suggBox.classList.remove('show'); setWelcome(); input.focus();
+  });
+
+  scroll.addEventListener('scroll',()=>{},{passive:true});
+  document.addEventListener('click',e=>{if(!e.target.closest('.dock')&&!e.target.closest('.suggestions'))suggBox.classList.remove('show');});
+
+  // keyboard avoidance
+  if(window.visualViewport){
+    const vv=window.visualViewport;
+    const onR=()=>{const overlap=Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      dock.style.transform=`translateY(${-overlap}px)`; positionSuggestions();};
+    vv.addEventListener('resize',onR); vv.addEventListener('scroll',onR);
+  }
+})();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+</script>
+</body>
+</html>
